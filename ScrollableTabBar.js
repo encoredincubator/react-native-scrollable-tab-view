@@ -57,9 +57,19 @@ const ScrollableTabBar = createReactClass({
 
   componentDidMount() {
     this.props.scrollValue.addListener(this.updateView);
+
+    // Known Issue: active tab's underline does not appear at initial time
+    // Solution: https://github.com/happypancake/react-native-scrollable-tab-view/issues/756#issuecomment-335325562
+    setTimeout(() => {
+      this.shouldFallbackOffset = false;
+    }, 1000)
   },
 
   updateView(offset) {
+    if (this.shouldFallbackOffset) {
+      offset.value = offset.value || 0
+    }
+
     const position = Math.floor(offset.value);
     const pageOffset = offset.value % 1;
     const tabCount = this.props.tabs.length;
